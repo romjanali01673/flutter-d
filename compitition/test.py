@@ -1,136 +1,52 @@
 import customtkinter as ctk
+import re
+import math
 
-
-def prepare(input_text):
-
-    input_text = input_text.replace("^", "**")
-    # input_text.replace("√", "**0.5")
-    # input_text.replace("^", "**")
-    # input_text.replace("^", "**")
-    # input_text.replace("^", "**")
-    # input_text.replace("^", "**")
-    # input_text.replace("^", "**")
-    # input_text.replace("^", "**")
-
-    return input_text
-
-
-def on_click(button_text):
-
-    if button_text == "AC":
-        entry_var.set("")
-    elif button_text=="C":
-        text = entry_var.get()
-        text = text[:-1]
-        entry_var.set(text)
-    elif button_text=="xʸ":
-        entry_var.set(entry_var.get() + "^")
-    elif button_text=="x²":
-        entry_var.set(entry_var.get() + "^2")
-    elif button_text == "=":
-        entry_var.set(prepare(entry_var.get()))
-        print(prepare(entry_var.get()))
-        try:
-            result = eval(entry_var.get())
-            entry_var.set(result)
-        except Exception:
-            entry_var.set("Error")
-    else:
-        entry_var.set(entry_var.get() + button_text)
-
-# Set appearance mode and color theme
-ctk.set_appearance_mode("System")  # Modes: "System", "Dark", "Light"
-ctk.set_default_color_theme("blue")  # Themes: "blue", "green", "dark-blue"
-
-# Create the main window
-root = ctk.CTk()
-root.title("Calculator 677844")
-root.geometry("300x580")
-root.configure(fg_color="black")
-# root.resizable(False, False)
-
-
-# Entry widget for displaying the input and results
-entry_var = ctk.StringVar()
-entry = ctk.CTkEntry(
-    root,
-    textvariable=entry_var,
-    font=("Arial", 20),
-    justify='right',
-    width=280,
-    height=50,
-    state="readonly",
-    corner_radius=10,
-)
-entry.pack(pady=10)
-
-# This list defines the layout of the calculator buttons.
-buttons = [
-
-    ("AC", "(", ")", "C",),
-    ("sin", "cos", "ten", "xʸ",),
-    ("log", "√", "π", "x²",),
-    ("x²", "%", "!", "+",),
+buttons=[
+    ("AC", "(", ")", "/",),
     ("1", "2", "3", "/",),
     ("4", "5", "6", "*",),
     ("7", "8", "9", "-",),
-    (".", "0", "=",),
+    ("AC", "0", "=", "+",),
 ]
 
-
-def getWidth(button_text):
-    if(button_text=="="):
-        return 120
-    else:
-        return 60
+def on_click(button_text):
+    print(button_text)
 
 def getColor(button_text):
-    if button_text=="AC":
+    if(button_text=="AC"):
         return "red"
-    elif button_text=="C":
-        return "#ff4000"
-    elif button_text=="=":
-        return "grey"
-    elif button_text=="(" or button_text==")":
-        return "darkblue"
-    elif button_text=="+" or button_text=="-" or button_text=="*" or button_text=="/":
-        return "#ff8000"
-    else:
-        return "blue"
     
-# Frame to hold the buttons
-button_frame = ctk.CTkFrame(root)
-button_frame.pack(fill='both', expand=True, padx=10, pady=10)
+root =ctk.CTk()
+root.geometry("300x480")
+root.title("romjan ali")
+root.configure(fg_color="black")
 
-# Create and place the buttons
+
+Entery = ctk.CTkEntry(
+    root,
+    width=280,
+    height=50,
+)
+Entery.pack(fill= "both", padx=10, pady=10)
+
+button_frame= ctk.CTkFrame(root)
+button_frame.pack(fill="both",expand=True, padx=10, pady=10,)
 for row in buttons:
-    row_frame = ctk.CTkFrame(button_frame)
-    row_frame.pack(fill='both', expand=True)
-    print(row)
+    row_frame= ctk.CTkFrame(button_frame)
+    row_frame.pack(expand=True, fill="both")
     for button_text in row:
         btn = ctk.CTkButton(
             row_frame,
             text=button_text,
-            font=("Arial", 18),
-            command=lambda text=button_text: on_click(text),
-            corner_radius=15,  # Rounded corners
-            width=getWidth(button_text),
+            command=lambda text = button_text:on_click(text),
+            fg_color="red",
+            hover_color="blue",
+            width=60,
             height=50,
-            fg_color= getColor(button_text),  # Background color
-            hover_color="darkblue",  # Background color on hover
+            
         )
-        btn.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        btn.pack(fill="both",side="left", padx=5, pady=5, expand=True)
+        
 
-# Run the application
 root.mainloop()
-
-
-
-
-
-
-
-
-
-
-# L@nc@ble
