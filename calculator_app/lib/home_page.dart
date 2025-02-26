@@ -144,8 +144,16 @@ class _MyHomePageState extends State<MyHomePage> {
     // Handle "(10)(10)" → "(10)*(10)"
     // Handle "(10)10" → "(10)*10"
     input = input.replaceAllMapped(RegExp(r'\)(\d|\()'), (match) => ')*${match[1]}');
+    // handel +. -> +0.
+    // handel -. -> +0.
+    // handel x. -> +0.
+    // handel /. -> +0.
+    // handel ). -> +0.
+    input = input.replaceAllMapped(RegExp(r'(\(|\+|\-|x|\/)\.'), (match) => '${match[1]}0.');
     // Handle "100%50" → "100%*50"
     input = input.replaceAllMapped(RegExp(r'\%(\d)'), (match) => '%*${match[1]}');
+    // handel "* -> x"
+    input = input.replaceAll(RegExp(r'\*'), 'x');
 
     return input;
   }
@@ -257,6 +265,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try{
       input_result = input_result.replaceAll('√', 'sqrt'); // '√' replace to 'sqrt'
       input_result = input_result.replaceAll('%', '/100'); // '%' replace to '1/100*' // example 345 * (1/100) * 20 (it's mean 20% of 345)
+      input_result = input_result.replaceAll('x', '*'); // 'x' replace to '*' // example 345 x 1 = 345 * 1
 
       ContextModel cm = ContextModel();
       cm.bindVariable(Variable('π'), Number(3.1416));

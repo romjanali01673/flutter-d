@@ -1,10 +1,11 @@
+
 import 'dart:math';
 
-import 'package:bishop/bishop.dart' as bishop;
+import 'package:chess_game/helper/helper_method.dart';
+import 'package:chess_game/main_screens/about_screen.dart';
+import 'package:chess_game/main_screens/game_time_screen.dart';
+import 'package:chess_game/main_screens/setting_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:square_bishop/square_bishop.dart';
-import 'package:squares/squares.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,83 +15,86 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late bishop.Game game;
-  late SquaresState state;
-  int player = Squares.white;
-  bool aiThinking = false;
-  bool flipBoard = false;
+
 
   @override
   void initState() {
-    _resetGame(false);
     super.initState();
   }
-
-  void _resetGame([bool ss = true]) {
-    game = bishop.Game(variant: bishop.Variant.standard());
-    state = game.squaresState(player);
-    if (ss) setState(() {});
-  }
-
-  void _flipBoard() => setState(() => flipBoard = !flipBoard);
-
-  void _onMove(Move move) async {
-    bool result = game.makeSquaresMove(move);
-    if (result) {
-      setState(() => state = game.squaresState(player));
-    }
-    if (state.state == PlayState.theirTurn && !aiThinking) {
-      setState(() => aiThinking = true);
-      await Future.delayed(
-          Duration(milliseconds: Random().nextInt(4750) + 250));
-      game.makeRandomMove();
-      setState(() {
-        aiThinking = false;
-        state = game.squaresState(player);
-      });
-    }
-  }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
+        leading: IconButton(
+         icon: const Icon(Icons.arrow_back, color: Colors.white,),
+          onPressed: (){
+            // show dialog if sure
+            Navigator.pop(context);
+          },
+        ),
+        backgroundColor: Colors.orange,
+        title: Text("romjan developer!"),
+        actions: [
+          IconButton(
+            onPressed: (){}, 
+            icon: const Icon(Icons.start ,color: Colors.white,),
+          ),
+          
+          IconButton(
+            onPressed: (){}, 
+            icon: const Icon(Icons.rotate_90_degrees_ccw ,color: Colors.white,),
+          ),
+          
+        ],
       ),
-      body:  Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      body: Padding(
+        padding: EdgeInsets.all(10),
+        child: GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: BoardController(
-                state: flipBoard ? state.board.flipped() : state.board,
-                playState: state.state,
-                pieceSet: PieceSet.merida(),
-                theme: BoardTheme.brown,
-                moves: state.moves,
-                onMove: _onMove,
-                onPremove: _onMove,
-                markerTheme: MarkerTheme(
-                  empty: MarkerTheme.dot,
-                  piece: MarkerTheme.corners(),
-                ),
-                promotionBehaviour: PromotionBehaviour.autoPremove,
-              ),
+            buildGameType(
+              label: "Play vs Computer", 
+              icon: Icons.computer, 
+              ontap: (){
+                // Navigate to play vs Computer Screen
+                print("play vs computer");
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>  const GameTimeScreen()),);
+              }
             ),
-            const SizedBox(height: 32),
-            OutlinedButton(
-              onPressed: _resetGame,
-              child: const Text('New Game'),
+            buildGameType(
+              label: "Play vs Friend",
+              icon: Icons.person, 
+              ontap: (){
+                // Navigate to play vs Friend Screen
+                print("play vs friend");
+                Navigator.push(context, MaterialPageRoute(builder: (context) => GameTimeScreen()),);
+              }
             ),
-            IconButton(
-              onPressed: _flipBoard,
-              icon: const Icon(Icons.rotate_left),
+            buildGameType(
+              label: "Setting", 
+              icon: Icons.settings, 
+              ontap: (){
+                // Navigate to Setting Screen
+                print("setting");
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>  const SettingScreen()),);
+              }
+            ),
+            buildGameType(
+              label: "About", 
+              icon: Icons.info, 
+              ontap: (){
+                // Navigate to About Screen
+                print("about");
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>  const AboutScreen()),);
+              }
             ),
           ],
         ),
       ),
     );
   }
+
+  
 }
