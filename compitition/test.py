@@ -1,5 +1,20 @@
 import customtkinter as ctk
 
+
+def prepare(input_text):
+
+    input_text = input_text.replace("^", "**")
+    # input_text.replace("√", "**0.5")
+    # input_text.replace("^", "**")
+    # input_text.replace("^", "**")
+    # input_text.replace("^", "**")
+    # input_text.replace("^", "**")
+    # input_text.replace("^", "**")
+    # input_text.replace("^", "**")
+
+    return input_text
+
+
 def on_click(button_text):
 
     if button_text == "AC":
@@ -8,7 +23,13 @@ def on_click(button_text):
         text = entry_var.get()
         text = text[:-1]
         entry_var.set(text)
+    elif button_text=="xʸ":
+        entry_var.set(entry_var.get() + "^")
+    elif button_text=="x²":
+        entry_var.set(entry_var.get() + "^2")
     elif button_text == "=":
+        entry_var.set(prepare(entry_var.get()))
+        print(prepare(entry_var.get()))
         try:
             result = eval(entry_var.get())
             entry_var.set(result)
@@ -18,13 +39,14 @@ def on_click(button_text):
         entry_var.set(entry_var.get() + button_text)
 
 # Set appearance mode and color theme
-# ctk.set_appearance_mode("System")  # Modes: "System", "Dark", "Light"
-# ctk.set_default_color_theme("blue")  # Themes: "blue", "green", "dark-blue"
+ctk.set_appearance_mode("System")  # Modes: "System", "Dark", "Light"
+ctk.set_default_color_theme("blue")  # Themes: "blue", "green", "dark-blue"
 
 # Create the main window
 root = ctk.CTk()
 root.title("Calculator 677844")
-root.geometry("300x440")
+root.geometry("300x580")
+root.configure(fg_color="black")
 # root.resizable(False, False)
 
 
@@ -37,20 +59,30 @@ entry = ctk.CTkEntry(
     justify='right',
     width=280,
     height=50,
+    state="readonly",
     corner_radius=10,
 )
 entry.pack(pady=10)
 
 # This list defines the layout of the calculator buttons.
 buttons = [
+
     ("AC", "(", ")", "C",),
+    ("sin", "cos", "ten", "xʸ",),
+    ("log", "√", "π", "x²",),
+    ("x²", "%", "!", "+",),
     ("1", "2", "3", "/",),
     ("4", "5", "6", "*",),
     ("7", "8", "9", "-",),
-    (".", "0", "=", "+",),
+    (".", "0", "=",),
 ]
 
 
+def getWidth(button_text):
+    if(button_text=="="):
+        return 120
+    else:
+        return 60
 
 def getColor(button_text):
     if button_text=="AC":
@@ -81,9 +113,9 @@ for row in buttons:
             text=button_text,
             font=("Arial", 18),
             command=lambda text=button_text: on_click(text),
-            corner_radius=20,  # Rounded corners
-            width=60,
-            height=60,
+            corner_radius=15,  # Rounded corners
+            width=getWidth(button_text),
+            height=50,
             fg_color= getColor(button_text),  # Background color
             hover_color="darkblue",  # Background color on hover
         )
@@ -91,3 +123,14 @@ for row in buttons:
 
 # Run the application
 root.mainloop()
+
+
+
+
+
+
+
+
+
+
+# L@nc@ble
