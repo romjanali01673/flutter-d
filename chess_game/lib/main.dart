@@ -1,9 +1,26 @@
+import 'package:chess_game/constants.dart';
+import 'package:chess_game/main_screens/about_screen.dart';
 import 'package:chess_game/main_screens/game_screen.dart';
+import 'package:chess_game/main_screens/game_start_up_screen.dart';
+import 'package:chess_game/main_screens/game_time_screen.dart';
 import 'package:chess_game/main_screens/home_screen.dart';
+import 'package:chess_game/main_screens/setting_screen.dart';
+import 'package:chess_game/providers/game_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+// void main() {
+//   runApp(const MyApp());
+// }
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_)=>GameProvider()),
+      ],
+      child:const MyApp(),
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -33,8 +50,15 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const GameScreen(),
-      // home: const HomeScreen(),
+      // home: const HomeScreen(),                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+      initialRoute: Constants.homeScreen,        
+      routes: {
+        Constants.homeScreen: (context)=>const HomeScreen(),
+        Constants.gameScreen: (context)=>const GameScreen(),
+        Constants.aboutScreen: (context)=>const AboutScreen(),
+        Constants.settingScreen: (context)=>const SettingScreen(),
+        Constants.gameTimeScreen: (context)=>const GameTimeScreen(),
+      },                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
     );
   }
 }

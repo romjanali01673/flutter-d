@@ -169,7 +169,7 @@ def on_click(button_text):
             entry_var.set(result)
         except Exception:
             entry_var.set("Error")
-        if(len(entry_var.get())>20):
+        if(len(entry_var.get())>30):
             entry_var.set("High Length Error")
     else:
         entry_var.set(entry_var.get() + button_text)
@@ -208,7 +208,6 @@ pre_input = ctk.CTkEntry(
     text_color="white",
     bg_color="black",
     fg_color="black",
-
 )
 pre_input.pack(fill="both", padx=10)
 

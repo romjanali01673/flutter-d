@@ -5,7 +5,9 @@ import 'package:chess_game/helper/helper_method.dart';
 import 'package:chess_game/main_screens/about_screen.dart';
 import 'package:chess_game/main_screens/game_time_screen.dart';
 import 'package:chess_game/main_screens/setting_screen.dart';
+import 'package:chess_game/providers/game_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final gameProvider = context.read<GameProvider>();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -58,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
               label: "Play vs Computer", 
               icon: Icons.computer, 
               ontap: (){
+                gameProvider.setVsComputer(value: true);
                 // Navigate to play vs Computer Screen
                 print("play vs computer");
                 Navigator.push(context, MaterialPageRoute(builder: (context) =>  const GameTimeScreen()),);
@@ -67,6 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
               label: "Play vs Friend",
               icon: Icons.person, 
               ontap: (){
+                gameProvider.setVsComputer(value: false);
                 // Navigate to play vs Friend Screen
                 print("play vs friend");
                 Navigator.push(context, MaterialPageRoute(builder: (context) => GameTimeScreen()),);
