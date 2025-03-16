@@ -1,7 +1,9 @@
 import 'package:bishop/bishop.dart';
 import 'package:chess_game/constants.dart';
+import 'package:chess_game/providers/authantication_provider.dart';
 import 'package:chess_game/providers/game_provider.dart';
 import 'package:chess_game/widgets/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +23,13 @@ class _GameStartUpScreenState extends State<GameStartUpScreen> {
 
   int whiteTime=0;
   int blackTime=0;
-  
+
+
+  @override
+  void initState() {
+    final gameProvider = context.read<GameProvider>();
+    gameProvider.setIsLoading(value: false);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,8 +48,8 @@ class _GameStartUpScreenState extends State<GameStartUpScreen> {
                     width: MediaQuery.of(context).size.width * 0.5,
                     child: PlayerColorRadioButton(
                       title: "Play As ${PlayerColor.white.name}",
-                      value: PlayerColor.white, 
-                      groupValue: gameProvider.playerColor, 
+                      value: PlayerColor.white,
+                      groupValue: gameProvider.playerColor,
                       onChanged: (value){
                         print("value 0: $value");
                         gameProvider.setPlayerColor(player: 0);// '0' mean white
@@ -54,7 +62,7 @@ class _GameStartUpScreenState extends State<GameStartUpScreen> {
                       setState(() {
                         whiteTime!=0? whiteTime--:whiteTime;
                       });
-                    }, 
+                    },
                     onRightArrowClicked: (){
                       setState(() {
                         whiteTime++;
@@ -85,9 +93,9 @@ class _GameStartUpScreenState extends State<GameStartUpScreen> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.5,
                     child: PlayerColorRadioButton(
-                      title: "Play As ${PlayerColor.black.name}", 
-                      value: PlayerColor.black, 
-                      groupValue: gameProvider.playerColor, 
+                      title: "Play As ${PlayerColor.black.name}",
+                      value: PlayerColor.black,
+                      groupValue: gameProvider.playerColor,
                       onChanged: (value){
                         gameProvider.setPlayerColor(player: 1);// '1' mean black
                         print("value 1: $value");
@@ -102,7 +110,7 @@ class _GameStartUpScreenState extends State<GameStartUpScreen> {
                           setState(() {
                             blackTime!=0? blackTime--:blackTime;
                           });
-                        }, 
+                        },
                         onRightArrowClicked: (){
                           setState(() {
                             blackTime++;
@@ -137,9 +145,9 @@ class _GameStartUpScreenState extends State<GameStartUpScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       GameLevelRadioButton(
-                        title: GameDificulty.easy.name, 
-                        value: GameDificulty.easy, 
-                        groupValue: gameProvider.gameDificulty, 
+                        title: GameDificulty.easy.name,
+                        value: GameDificulty.easy,
+                        groupValue: gameProvider.gameDificulty,
                         onChanged: (value){
                           gameProvider.setGameDificulty(level: 1);
                         },
@@ -148,9 +156,9 @@ class _GameStartUpScreenState extends State<GameStartUpScreen> {
                         width: 10,
                       ),
                       GameLevelRadioButton(
-                        title: GameDificulty.medium.name, 
-                        value: GameDificulty.medium, 
-                        groupValue: gameProvider.gameDificulty, 
+                        title: GameDificulty.medium.name,
+                        value: GameDificulty.medium,
+                        groupValue: gameProvider.gameDificulty,
                         onChanged: (value){
                           gameProvider.setGameDificulty(level: 2);
                         },
@@ -159,8 +167,8 @@ class _GameStartUpScreenState extends State<GameStartUpScreen> {
                         width: 10,
                       ),
                       GameLevelRadioButton(
-                        title: GameDificulty.hard.name, 
-                        value: GameDificulty.hard, 
+                        title: GameDificulty.hard.name,
+                        value: GameDificulty.hard,
                         groupValue: gameProvider.gameDificulty,
                         onChanged: (value){
                           gameProvider.setGameDificulty(level: 3);
@@ -174,11 +182,17 @@ class _GameStartUpScreenState extends State<GameStartUpScreen> {
               SizedBox(
                 height: 10,
               ),
+              gameProvider.isLoading? const CircularProgressIndicator() :
               ElevatedButton(onPressed: (){
                 // Navigate to game Screen
                 playGame(gameProvider : gameProvider);
-              }, child: Text("Play"))
-
+              },
+                child: Text("Play"),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              gameProvider.vsComputer? const SizedBox.shrink() : Text(gameProvider.waitingText, textAlign: TextAlign.center,),
             ],
           ),
         );
@@ -186,6 +200,7 @@ class _GameStartUpScreenState extends State<GameStartUpScreen> {
     );
   }
   void playGame({required GameProvider gameProvider}) async{
+  final authProvider = context.read<AuthenticationProvider>();
     if(widget.isCustomTime){// for custom
       if(whiteTime<=0 || blackTime <= 0){
         showSnackBar( context : context, content: "Time Can't be 0");
@@ -227,7 +242,7 @@ class _GameStartUpScreenState extends State<GameStartUpScreen> {
         newSavedWhitesTime: gameTime, 
         newSavedBlacksTime: gameTime,
         ).whenComplete(
-          (){
+          ()async{
             if(gameProvider.vsComputer){
               gameProvider.setIsLoading(value: false);
               // Navigate to game Screen
@@ -235,11 +250,35 @@ class _GameStartUpScreenState extends State<GameStartUpScreen> {
             }
             else{
               // search for players
-               
+              await gameProvider.searchPlayer(
+                userModel:authProvider.userModel!,
+                onSuccess: (){
+                  //navigate to game screen
+                  if(gameProvider.waitingText==Constants.searchingPlayerText){
+                    // stay on this screen and wait
+                    gameProvider.checkIfOpponentJoined(
+                      userModel: authProvider.userModel!,
+                      onSuccess:(){
+                        gameProvider.setIsLoading(value: false);
+                        Navigator.pushNamed(context, Constants.gameScreen);
+                      },
+                    );
+                  }
+                  else{
+                    // navigate to game Screen
+                    gameProvider.setIsLoading(value: false);
+                    Navigator.pushNamed(context, Constants.gameScreen);
+                  }
+                },
+                onFail: (error){
+                  gameProvider.setIsLoading(value: false);
+                  gameProvider.setWaitingText(value: "Something Wrong.\nTry Again!"); // as empty
+                  showSnackBar(context: context, content: error);
+                },
+              );
             }
           }
         );
-
     }
   }
 }

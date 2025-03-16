@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:chess_game/providers/game_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:squares/squares.dart';
 
 final List<String> gameTimes =[
@@ -54,4 +57,53 @@ String getTimerToDisplay({required GameProvider gameProvider, required bool isUs
     }
   }
   return timer;
+}
+
+var textFormDecoration = InputDecoration(
+    border: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    ),
+    enabledBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    borderSide: const BorderSide(color: Colors.black, width: 1,)
+    ),
+    focusedBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    borderSide: const BorderSide(color: Colors.blue, width: 1,)
+    ),
+  );
+
+Future<File?> pickImage({
+  required BuildContext context,
+  required bool fromCamera,
+  required Function(String) onFail,
+})async{
+  File ?fileImage;
+  // from camera
+  if(fromCamera){
+    try{
+      final takenPhoto = await ImagePicker().pickImage(source: ImageSource.camera);
+      if(takenPhoto!=null){
+        fileImage = File(takenPhoto.path);
+      }
+    }catch(e){
+      onFail(e.toString());
+    }
+  }
+  // from gallery
+  else{
+    try{
+      final ChoosenImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if(ChoosenImage!=null){
+        fileImage = File(ChoosenImage.path);
+      }
+    }catch(e){
+      onFail(e.toString());
+    }
+  }
+  return fileImage;
+}
+
+bool emailValid(String value){
+  return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value);
 }

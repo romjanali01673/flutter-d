@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:chess_game/authentication/landing_acreen.dart';
 import 'package:chess_game/constants.dart';
 import 'package:chess_game/main_screens/about_screen.dart';
 import 'package:chess_game/main_screens/game_screen.dart';
@@ -5,23 +8,57 @@ import 'package:chess_game/main_screens/game_start_up_screen.dart';
 import 'package:chess_game/main_screens/game_time_screen.dart';
 import 'package:chess_game/main_screens/home_screen.dart';
 import 'package:chess_game/main_screens/setting_screen.dart';
+import 'package:chess_game/providers/authantication_provider.dart';
 import 'package:chess_game/providers/game_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'authentication/login_screen.dart';
+import 'authentication/sign_up_screen.dart';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 // void main() {
 //   runApp(const MyApp());
 // }
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // mainx();
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_)=>GameProvider()),
+        ChangeNotifierProvider(create: (_)=>AuthenticationProvider()),
       ],
       child:const MyApp(),
     )
   );
 }
+void mainx() async {
+  // Path to Stockfish engine (update based on your OS)
+  String stockfishPath = "assets/stockfish/stockfish.exe"; // Windows
+  // String stockfishPath = "assets/stockfish/stockfish"; // macOS/Linux
+
+  // Start Stockfish
+  Process process = await Process.start(stockfishPath, []);
+
+  // Send UCI command
+  process.stdin.writeln("uci");
+
+  // Listen for Stockfish output
+  process.stdout.transform(SystemEncoding().decoder).listen((data) {
+    print("Stockfish Output: $data");
+  });
+
+  // Stop the engine (Optional)
+  // process.kill();
+}
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -51,14 +88,17 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // home: const HomeScreen(),                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-      initialRoute: Constants.homeScreen,        
+      initialRoute: Constants.landingScreen,
       routes: {
         Constants.homeScreen: (context)=>const HomeScreen(),
         Constants.gameScreen: (context)=>const GameScreen(),
         Constants.aboutScreen: (context)=>const AboutScreen(),
         Constants.settingScreen: (context)=>const SettingScreen(),
         Constants.gameTimeScreen: (context)=>const GameTimeScreen(),
-      },                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+        Constants.signInScreen: (context)=>const LoginScreen(),
+        Constants.signUpScreen: (context)=>const SignUpScreen(),
+        Constants.landingScreen: (context)=>const LandingScreen(),
+      },
     );
   }
 }
